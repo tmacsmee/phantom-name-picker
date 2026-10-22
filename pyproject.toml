@@ -1,0 +1,13 @@
+[project]
+name = "phq-ghost-name-picker"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.13"
+dependencies = [
+    "google-cloud-ndb>=2.7.1",
+    "secure-scaffold",
+]
+
+[tool.uv.sources]
+secure-scaffold = { url = "https://github.com/google/gae-secure-scaffold-python3/archive/master.zip" }
