@@ -1,5 +1,3 @@
-set -o errexit -o nounset
-
 PROJECT="python-app"
 FLASK_APP="main:app"
 
@@ -13,9 +11,9 @@ gcloud beta emulators datastore start \
 sleep 5
 $(gcloud beta emulators datastore env-init)
 
-# Start your local development server.
-export FLASK_SETTINGS_FILENAME="settings.py"
-FLASK_APP="$FLASK_APP" uv run flask run --debug
+# # Start your local development server.
+# export FLASK_SETTINGS_FILENAME="settings.py"
+# FLASK_APP="$FLASK_APP" uv run flask run --debug
 
 # Clean up the datastore emulator.
-curl --silent -X POST "$DATASTORE_HOST/shutdown"
+# curl --silent -X POST "$DATASTORE_HOST/shutdown"
