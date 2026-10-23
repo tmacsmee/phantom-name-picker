@@ -2,8 +2,12 @@ import securescaffold
 import os
 from insert_ghost_names import insert_ghost_names
 from google.cloud import ndb
-from flask import jsonify
+from flask import jsonify, url_for, session, redirect
 from models import GhostName
+from authlib.integrations.flask_client import OAuth
+from dotenv import load_dotenv
+
+load_dotenv()
 
 STATIC_FOLDER = "frontend/dist"
 
@@ -12,6 +16,17 @@ app.static_folder = STATIC_FOLDER
 app.static_url_path = "/"
 
 client = ndb.Client()
+
+oauth = OAuth(app)
+
+CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
+google = oauth.register(
+    name="google",
+    server_metadata_url=CONF_URL,
+    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
+    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+    client_kwargs={"scope": "openid email profile"},
+)
 
 
 @app.route("/", defaults={"path": ""})
@@ -28,3 +43,17 @@ def api():
         query = GhostName.query()
         ghosts = query.fetch()
         return jsonify([ghost.ghost_name for ghost in ghosts])
+
+
+@app.route("/api/login")
+def login():
+    # redirect_uri = url_for("auth", _external=True)
+    redirect_uri = "http://localhost:5173/api/auth"
+    return oauth.google.authorize_redirect(redirect_uri)
+
+
+@app.route("/api/auth")
+def auth():
+    token = oauth.google.authorize_access_token()
+    session["user"] = token["userinfo"]
+    return redirect("/")

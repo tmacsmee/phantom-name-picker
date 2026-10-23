@@ -5,7 +5,9 @@ description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.13"
 dependencies = [
+    "authlib>=1.9.1",
     "google-cloud-ndb>=2.7.1",
+    "python-dotenv>=1.2.4",
     "secure-scaffold",
 ]
 

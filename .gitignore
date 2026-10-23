@@ -10,3 +10,4 @@ wheels/
 .venv
 
 ghost-names.csv
+.env
