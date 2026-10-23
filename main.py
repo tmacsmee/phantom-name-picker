@@ -2,7 +2,7 @@ import securescaffold
 import os
 from insert_ghost_names import insert_ghost_names
 from google.cloud import ndb
-from flask import jsonify, url_for, session, redirect
+from flask import jsonify, url_for, session, redirect, abort
 from models import GhostName
 from authlib.integrations.flask_client import OAuth
 from dotenv import load_dotenv
@@ -52,8 +52,22 @@ def login():
     return oauth.google.authorize_redirect(redirect_uri)
 
 
+@app.route("/api/logout")
+def logout():
+    session.pop("user", None)
+    return redirect("/")
+
+
 @app.route("/api/auth")
 def auth():
     token = oauth.google.authorize_access_token()
     session["user"] = token["userinfo"]
     return redirect("/")
+
+
+@app.route("/api/user")
+def user():
+    user = session["user"]
+    if user is None:
+        return abort(404, "Not logged in")
+    return jsonify(user)
