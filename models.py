@@ -8,4 +8,5 @@ class GhostName(ndb.Model):
 
 
 class User(ndb.Model):
-    user_id = ndb.StringProperty()
+    ghostNameKey = ndb.StringProperty()
+    email = ndb.StringProperty()
