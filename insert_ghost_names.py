@@ -1,4 +1,4 @@
-from models import GhostName, User
+from models import Ghost, User
 from google.cloud import ndb
 import csv
 
@@ -17,9 +17,9 @@ def insert_ghost_names(client: ndb.Client):
                 name = row["Ghost name"]
                 description = row["Description"]
 
-                key = ndb.Key(GhostName, normalise(name))
+                key = ndb.Key(Ghost, normalise(name))
 
-                ghostName = GhostName(key=key, ghost_name=name)
+                ghostName = Ghost(key=key, ghost_name=name)
                 ghostNames.append(ghostName)
 
             ndb.put_multi(ghostNames)

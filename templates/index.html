@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+{% block content %}
+  <section>
+    <a href="/form">Create a ghost name</a>
+    <ul>
+      {% for ghost in ghosts %}
+        <li>
+          {{ ghost["first_name"] }} "{{ ghost["ghost_name"] }}"
+          {{ ghost["last_name"] }}
+        </li>
+      {% endfor %}
+    </ul>
+  </section>
+{% endblock %}

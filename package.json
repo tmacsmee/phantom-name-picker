@@ -1,0 +1,19 @@
+{
+  "name": "phq-ghost-name-picker",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "tailwind": "tailwindcss -i ./index.css -o ./static/styles.css --watch",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@tailwindcss/cli": "^4.3.3",
+    "prettier": "^3.9.10",
+    "prettier-plugin-jinja-template": "^2.2.0",
+    "tailwindcss": "^4.3.3"
+  }
+}

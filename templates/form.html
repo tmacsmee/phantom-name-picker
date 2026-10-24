@@ -1,0 +1,61 @@
+{% extends "base.html" %}
+{% block content %}
+  <section class="flex flex-col items-center">
+    {% if not user %}
+      <a href="{{ url_for('login') }}" className="border p-2">Log in </a>
+    {% endif %}
+    {% if user %}
+      <form
+        class="flex flex-col gap-y-4"
+        action="{{ url_for('form') }}"
+        method="POST"
+      >
+        <div class="flex flex-col">
+          <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
+          <label for="first_name">First name</label>
+          <input
+            id="first_name"
+            name="first_name"
+            type="text"
+            required
+            maxlength="32"
+            class="border"
+          />
+        </div>
+
+        <div class="flex flex-col">
+          <label for="last_name">Last name</label>
+          <input
+            id="last_name"
+            name="last_name"
+            type="text"
+            required
+            maxlength="32"
+            class="border"
+          />
+        </div>
+
+        <button type="submit" class="border p-2">Generate ghost names</button>
+      </form>
+    {% endif %}
+
+    {% if ghosts %}
+      <form action="{{ url_for('ghost') }}" method="POST">
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
+
+        <input type="hidden" name="first_name" value="{{ name[0] }}" />
+        <input type="hidden" name="last_name" value="{{ name[1] }}" />
+
+        <ul>
+          {% for ghost in ghosts %}
+            <li>
+              <button name="ghost" value="{{ ghost }}" class="border p-1.5">
+                {{ name[0] }} "{{ ghost }}" {{ name[1] }}
+              </button>
+            </li>
+          {% endfor %}
+        </ul>
+      </form>
+    {% endif %}
+  </section>
+{% endblock %}
