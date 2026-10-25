@@ -1,4 +1,4 @@
-FLASK_APP="main:app"
+FLASK_APP="src/main:app"
 
 # Start your local development server.
 export FLASK_SETTINGS_FILENAME="settings.py"
