@@ -27,6 +27,7 @@
             required
             maxlength="32"
             placeholder="John"
+            value="{{ name[0] }}"
             class="border border-mauve-700 bg-mauve-900 px-2.5 py-1 rounded-md"
           />
         </div>
@@ -40,6 +41,7 @@
             required
             maxlength="32"
             placeholder="Doe"
+            value="{{ name[1] }}"
             class="border border-mauve-700 bg-mauve-900 px-2.5 py-1 rounded-md"
           />
         </div>
@@ -60,7 +62,7 @@
         <input type="hidden" name="first_name" value="{{ name[0] }}" />
         <input type="hidden" name="last_name" value="{{ name[1] }}" />
 
-        <ul class="flex gap-x-4">
+        <ul class="grid gap-4 sm:grid-cols-3">
           {% for ghost in ghosts %}
             <li>
               <button

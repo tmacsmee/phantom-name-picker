@@ -15,11 +15,13 @@ def insert_ghost_names(client: ndb.Client):
             ghost_names = []
             for row in dict_reader:
                 name = row["Ghost name"]
-                description = row["Description"]
-
                 key = ndb.Key(Ghost, normalise(name))
 
-                ghost_name = Ghost(key=key, ghost_name=name)
+                ghost_name = Ghost(
+                    key=key,
+                    ghost_name=name,
+                    description=row["Description"],
+                )
                 ghost_names.append(ghost_name)
 
             ndb.put_multi(ghost_names)
@@ -40,13 +42,14 @@ def insert_dummy_users(client: ndb.Client):
             if ghost is None:
                 raise ValueError(f"Ghost does not exist: {ghost_name}")
 
-            ghost.first_name = first_name
-            ghost.last_name = last_name
+            ghost.owner_user_id = user_id
 
             user = User(
                 key=ndb.Key(User, user_id),
                 email=email,
                 ghost_key=ghost_key,
+                first_name=first_name,
+                last_name=last_name,
             )
             entities.extend([ghost, user])
 

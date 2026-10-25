@@ -6,9 +6,9 @@
     </h1>
     <a
       href="/form"
-      class=" px-2.5 py-2 rounded-md hover:bg-mauve-800 transition-colors bg-mauve-900 font-medium text-sm"
+      class="px-2.5 py-2 rounded-md hover:bg-mauve-800 transition-colors bg-mauve-900 font-medium text-sm"
     >
-      {{ "Change your current Phantom name" if user else "Get a Phantom name" }}
+      {{ "Change your current Phantom name" if has_ghost else "Get a Phantom name" }}
     </a>
     <ul class="max-w-lg w-full">
       {% for ghost in ghosts %}

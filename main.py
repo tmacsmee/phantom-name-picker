@@ -48,50 +48,80 @@ def auth():
 
 @app.get("/")
 def index():
-    user = session.get("user")
+    auth_user = session.get("user")
 
     with client.context():
-        users = User.query(User.ghost_key > "").fetch()
+        ghosts = Ghost.query().fetch()
+        owner_keys = [
+            ndb.Key(User, ghost.owner_user_id)
+            for ghost in ghosts
+            if ghost.owner_user_id
+        ]
+        owners = {
+            user.key.id(): user
+            for user in ndb.get_multi(owner_keys)
+            if user is not None
+        }
 
-        ghost_keys = [ndb.Key(Ghost, user.ghost_key) for user in users]
-        ghosts = ndb.get_multi(ghost_keys)
+        allocated = [
+            {
+                "ghost_name": ghost.ghost_name,
+                "description": ghost.description,
+                "first_name": owners[ghost.owner_user_id].first_name,
+                "last_name": owners[ghost.owner_user_id].last_name,
+                "email": owners[ghost.owner_user_id].email,
+            }
+            for ghost in ghosts
+            if ghost.owner_user_id in owners
+        ]
 
-        allocated = []
-        for user, ghost in zip(users, ghosts):
-            if ghost is None:
-                continue
-            allocated.append(
-                {
-                    "ghost_name": ghost.ghost_name,
-                    "first_name": ghost.first_name,
-                    "last_name": ghost.last_name,
-                    "email": user.email,
-                }
-            )
+        current_user = None
+        if auth_user:
+            current_user = ndb.Key(User, auth_user["sub"]).get()
 
-    return render_template("index.html", ghosts=allocated, user=user)
+    return render_template(
+        "index.html",
+        ghosts=allocated,
+        user=auth_user,
+        has_ghost=bool(current_user and current_user.ghost_key),
+    )
 
 
 @app.get("/form")
 def form():
     user = session.get("user")
+    if not user:
+        return redirect(url_for("login"))
 
-    return render_template("form.html", user=user)
+    return render_template("form.html", user=user, name=("", ""))
 
 
 @app.post("/form")
 def ghosts():
     user = session.get("user")
+    if not user:
+        return abort(401)
+
+    first_name = request.form.get("first_name", "").strip()
+    last_name = request.form.get("last_name", "").strip()
+    if not first_name or not last_name:
+        return abort(400, "First and last name are required")
 
     with client.context():
-        query = Ghost.query()
-        ghosts = query.fetch()
-        print(ghosts)
+        available = Ghost.query(Ghost.owner_user_id == None).fetch()
+        options = [
+            ghost.ghost_name
+            for ghost in random.sample(available, min(3, len(available)))
+        ]
 
-        options = [ghost.ghost_name for ghost in random.sample(ghosts, 3)]
-        name = (request.form.get("first_name"), request.form.get("last_name"))
+        session["ghost_options"] = options
 
-        return render_template("form.html", user=user, ghosts=options, name=name)
+        return render_template(
+            "form.html",
+            user=user,
+            ghosts=options,
+            name=(first_name, last_name),
+        )
 
 
 @app.post("/ghost")
@@ -107,13 +137,21 @@ def ghost():
     if not user:
         return abort(401)
 
+    if selected not in session.pop("ghost_options", []):
+        return abort(400, "Invalid or expired ghost name")
+
     user_id = user["sub"]
 
     with client.context():
         try:
-            update_ghost_name(user_id, selected, first_name, last_name)
-        except Exception as e:
-            print(e)
-            return abort(500)
+            update_ghost_name(
+                user_id,
+                selected,
+                first_name,
+                last_name,
+                user.get("email", ""),
+            )
+        except ValueError as error:
+            return abort(409, str(error))
 
     return redirect(url_for("index"))
