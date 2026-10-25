@@ -51,7 +51,23 @@ then deploy:
 gcloud app deploy app.yaml --project PROJECT_ID
 ```
 
-Run the seed operation against the target project before inviting users.
+The GitHub Actions workflow deploys `app.yaml` and injects these GitHub
+repository or environment secrets through the App Engine action:
+
+- `GCP_PROJECT_ID`
+- `GCP_WIF_PROVIDER`
+- `GCP_DEPLOY_SERVICE_ACCOUNT`
+- `GOOGLE_CLIENT_ID`
+- `GOOGLE_CLIENT_SECRET`
+
+The workflow then runs `cloudbuild.seed.yaml` to seed the catalog. The GitHub
+deployment service account needs App Engine Admin, Cloud Build Editor, Storage
+Admin, Artifact Registry Reader, and Service Account User. The Cloud Build
+service account needs `roles/datastore.user` on the project.
+
+Push to `main` or start the workflow manually from the Actions tab. The seed
+job is idempotent and preserves existing ghost ownership.
+
 Production OAuth secrets must not be committed to `.env` or this repository.
 
 ## Design notes

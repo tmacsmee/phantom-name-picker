@@ -1,0 +1,16 @@
+steps:
+  - name: python:3.13
+    entrypoint: bash
+    env:
+      - GOOGLE_CLOUD_PROJECT=${_GOOGLE_CLOUD_PROJECT}
+    args:
+      - -c
+      - |
+        pip install --no-cache-dir -r requirements.txt
+        python seed_database.py
+
+substitutions:
+  _GOOGLE_CLOUD_PROJECT: ""
+
+options:
+  logging: CLOUD_LOGGING_ONLY

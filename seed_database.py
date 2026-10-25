@@ -17,13 +17,13 @@ def insert_ghost_names(client: ndb.Client):
             for row in dict_reader:
                 name = row["Ghost name"]
                 key = ndb.Key(Ghost, normalise(name))
+                ghost = key.get()
 
-                ghost_name = Ghost(
-                    key=key,
-                    ghost_name=name,
-                    description=row["Description"],
-                )
-                ghost_names.append(ghost_name)
+                if ghost is None:
+                    ghost = Ghost(key=key)
+                ghost.ghost_name = name
+                ghost.description = row["Description"]
+                ghost_names.append(ghost)
 
             ndb.put_multi(ghost_names)
 
@@ -60,4 +60,3 @@ def insert_dummy_users(client: ndb.Client):
 if __name__ == "__main__":
     seed_client = ndb.Client(project=os.getenv("GOOGLE_CLOUD_PROJECT"))
     insert_ghost_names(seed_client)
-    insert_dummy_users(seed_client)
