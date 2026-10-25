@@ -41,7 +41,7 @@ def login():
 @app.get("/logout")
 def logout():
     session.pop("user", None)
-    return redirect(url_for("form"))
+    return redirect(url_for("index"))
 
 
 @app.get("/auth")
