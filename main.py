@@ -5,13 +5,14 @@ from google.cloud import ndb
 from flask import jsonify, url_for, session, redirect, abort, request, render_template
 from models import Ghost, User, update_ghost_name
 from authlib.integrations.flask_client import OAuth
+from authlib.integrations.base_client.errors import OAuthError
 from dotenv import load_dotenv
 import random
 
 load_dotenv()
 
 app = securescaffold.create_app(__name__)
-client = ndb.Client(project="python-app")
+client = ndb.Client(project=os.getenv("GOOGLE_CLOUD_PROJECT"))
 oauth = OAuth(app)
 
 # insert_ghost_names(client)
@@ -29,6 +30,10 @@ google = oauth.register(
 
 @app.get("/login")
 def login():
+    if not os.environ.get("GOOGLE_CLIENT_ID") or not os.environ.get(
+        "GOOGLE_CLIENT_SECRET"
+    ):
+        return abort(503, "Google authentication is not configured")
     redirect_uri = url_for("auth", _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
@@ -41,8 +46,20 @@ def logout():
 
 @app.get("/auth")
 def auth():
-    token = oauth.google.authorize_access_token()
-    session["user"] = token["userinfo"]
+    try:
+        token = oauth.google.authorize_access_token()
+    except OAuthError:
+        return abort(401, "Google authentication failed")
+
+    user_info = token.get("userinfo")
+    if not user_info or not user_info.get("sub"):
+        return abort(401, "Google profile is incomplete")
+
+    session["user"] = {
+        "sub": user_info["sub"],
+        "email": user_info.get("email", ""),
+        "name": user_info.get("name", ""),
+    }
     return redirect("/")
 
 
