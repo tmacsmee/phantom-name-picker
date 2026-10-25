@@ -60,7 +60,7 @@ def auth():
         "email": user_info.get("email", ""),
         "name": user_info.get("name", ""),
     }
-    return redirect("/")
+    return redirect(url_for("form"))
 
 
 @app.get("/")
