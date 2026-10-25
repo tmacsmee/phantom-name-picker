@@ -10,6 +10,11 @@
     >
       {{ "Change your current Phantom name" if has_ghost else "Get a Phantom name" }}
     </a>
+    {% if user %}
+      <a href="{{ url_for('logout') }}" class="text-sm text-mauve-400 hover:text-white">
+        Sign out
+      </a>
+    {% endif %}
     <ul class="max-w-lg w-full">
       {% for ghost in ghosts %}
         <li
@@ -23,5 +28,8 @@
         </li>
       {% endfor %}
     </ul>
+    {% if not ghosts %}
+      <p class="text-mauve-400">No Phantom names have been claimed yet.</p>
+    {% endif %}
   </section>
 {% endblock %}

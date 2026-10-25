@@ -1,0 +1,6 @@
+authlib>=1.9.1
+Flask>=3.1.0
+google-cloud-ndb>=2.7.1
+gunicorn>=23.0.0
+python-dotenv>=1.2.4
+secure-scaffold @ https://github.com/google/gae-secure-scaffold-python3/archive/master.zip

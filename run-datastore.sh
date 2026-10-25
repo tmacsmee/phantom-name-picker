@@ -1,11 +1,13 @@
 PROJECT="python-app"
-FLASK_APP="main:app"
 
-
-# Set --host-port to work around bug with NDB unable to connect to ::1.
+# Set --host-port to work around a bug with NDB unable to connect to ::1.
 gcloud beta emulators datastore start \
     --project "$PROJECT" \
-    --host-port localhost
+    --host-port localhost:8081 &
+EMULATOR_PID=$!
 
-sleep 5
-$(gcloud beta emulators datastore env-init)
+trap 'kill "$EMULATOR_PID"' EXIT
+
+eval "$(gcloud beta emulators datastore env-init)"
+
+wait "$EMULATOR_PID"

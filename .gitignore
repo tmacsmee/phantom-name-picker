@@ -10,5 +10,4 @@ wheels/
 .venv
 
 node_modules/
-ghost-names.csv
 .env

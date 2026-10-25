@@ -132,20 +132,22 @@ def ghosts():
         ]
 
         session["ghost_options"] = options
+        session["ghost_name"] = [first_name, last_name]
 
         return render_template(
             "form.html",
             user=user,
             ghosts=options,
             name=(first_name, last_name),
+            available_count=len(available),
         )
 
 
 @app.post("/ghost")
 def ghost():
     selected = request.form.get("ghost")
-    first_name = request.form.get("first_name")
-    last_name = request.form.get("last_name")
+    first_name = request.form.get("first_name", "").strip()
+    last_name = request.form.get("last_name", "").strip()
 
     if not selected or not first_name or not last_name:
         return abort(400, "No name selected")
@@ -153,6 +155,10 @@ def ghost():
     user = session.get("user")
     if not user:
         return abort(401)
+
+    expected_name = session.pop("ghost_name", [])
+    if [first_name, last_name] != expected_name:
+        return abort(400, "The form has expired")
 
     if selected not in session.pop("ghost_options", []):
         return abort(400, "Invalid or expired ghost name")

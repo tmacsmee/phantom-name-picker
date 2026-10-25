@@ -1,6 +1,7 @@
 from models import Ghost, User
 from google.cloud import ndb
 import csv
+import os
 
 
 def normalise(name: str) -> str:
@@ -54,3 +55,8 @@ def insert_dummy_users(client: ndb.Client):
             entities.extend([ghost, user])
 
         ndb.put_multi(entities)
+
+
+if __name__ == "__main__":
+    seed_client = ndb.Client(project=os.getenv("GOOGLE_CLOUD_PROJECT"))
+    insert_ghost_names(seed_client)

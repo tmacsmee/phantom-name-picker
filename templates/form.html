@@ -77,5 +77,13 @@
         </ul>
       </form>
     {% endif %}
+
+    {% if user and available_count is defined and available_count == 0 %}
+      <p class="text-mauve-400">There are no Phantom names available right now.</p>
+    {% elif user and available_count is defined and available_count < 3 %}
+      <p class="text-mauve-400">
+        Only {{ available_count }} Phantom name{{ "s" if available_count != 1 }} remain available.
+      </p>
+    {% endif %}
   </main>
 {% endblock %}
