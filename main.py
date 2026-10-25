@@ -41,7 +41,7 @@ def login():
 @app.get("/logout")
 def logout():
     session.pop("user", None)
-    return redirect("/form")
+    return redirect(url_for("form"))
 
 
 @app.get("/auth")
@@ -107,9 +107,6 @@ def index():
 @app.get("/form")
 def form():
     user = session.get("user")
-    if not user:
-        return redirect(url_for("login"))
-
     return render_template("form.html", user=user, name=("", ""))
 
 
