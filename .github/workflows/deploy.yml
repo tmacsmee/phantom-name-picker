@@ -35,13 +35,18 @@ jobs:
             GOOGLE_CLIENT_ID=617369660388-6ou6v8iv6ae3t4idbdl6fst2smjdmkmr.apps.googleusercontent.com
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
 
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Install seed dependencies
+        run: pip install google-cloud-ndb
+
       - name: Seed ghost catalog
-        run: >-
-          gcloud builds submit
-          --config cloudbuild.seed.yaml
-          --substitutions=_GOOGLE_CLOUD_PROJECT=project-0fa1ad10-8b1e-4ade-9df
-          --project project-0fa1ad10-8b1e-4ade-9df
-          --quiet
+        env:
+          GOOGLE_CLOUD_PROJECT: project-0fa1ad10-8b1e-4ade-9df
+        run: python seed_database.py
 
       - name: Print deployed URL
         run: echo "Deployed ${{ steps.deploy.outputs.version_url }}"
