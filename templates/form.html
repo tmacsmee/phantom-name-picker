@@ -1,41 +1,48 @@
 {% extends "base.html" %}
 {% block content %}
-  <section class="flex flex-col items-center">
+  <main class="flex flex-col">
     {% if not user %}
-      <a href="{{ url_for('login') }}" className="border p-2">Log in </a>
+      <a href="{{ url_for('login') }}" className="border p-2">Log in</a>
     {% endif %}
     {% if user %}
       <form
-        class="flex flex-col gap-y-4"
+        class="flex flex-col gap-y-4 max-w-sm w-full mx-auto"
         action="{{ url_for('form') }}"
         method="POST"
       >
-        <div class="flex flex-col">
+        <div class="flex gap-y-2 flex-col">
           <input type="hidden" name="_csrf_token" value="{{ csrf_token() }}" />
-          <label for="first_name">First name</label>
+          <label for="first_name" class="font-medium">First name</label>
           <input
             id="first_name"
             name="first_name"
             type="text"
             required
             maxlength="32"
-            class="border"
+            placeholder="John"
+            class="border border-mauve-700 bg-mauve-900 px-2.5 py-1 rounded-md"
           />
         </div>
 
-        <div class="flex flex-col">
-          <label for="last_name">Last name</label>
+        <div class="flex flex-col gap-y-2">
+          <label for="last_name" class="font-medium">Last name</label>
           <input
             id="last_name"
             name="last_name"
             type="text"
             required
             maxlength="32"
-            class="border"
+            placeholder="Doe"
+            class="border border-mauve-700 bg-mauve-900 px-2.5 py-1 rounded-md"
           />
         </div>
 
-        <button type="submit" class="border p-2">Generate ghost names</button>
+        <button
+          type="submit"
+          class="border border-mauve-700 bg-mauve-900 px-2.5 py-2 rounded-md hover:bg-mauve-800 font-medium text-sm"
+        >
+          Generate ghost names
+        </button>
       </form>
     {% endif %}
 
@@ -46,10 +53,14 @@
         <input type="hidden" name="first_name" value="{{ name[0] }}" />
         <input type="hidden" name="last_name" value="{{ name[1] }}" />
 
-        <ul>
+        <ul class="flex gap-x-4">
           {% for ghost in ghosts %}
             <li>
-              <button name="ghost" value="{{ ghost }}" class="border p-1.5">
+              <button
+                name="ghost"
+                value="{{ ghost }}"
+                class="border border-mauve-700 bg-mauve-900 px-2.5 py-2 rounded-md hover:bg-mauve-800 font-medium text-sm"
+              >
                 {{ name[0] }} "{{ ghost }}" {{ name[1] }}
               </button>
             </li>
@@ -57,5 +68,5 @@
         </ul>
       </form>
     {% endif %}
-  </section>
+  </main>
 {% endblock %}

@@ -1,12 +1,25 @@
 {% extends "base.html" %}
 {% block content %}
-  <section>
-    <a href="/form">Create a ghost name</a>
-    <ul>
+  <section class="flex flex-col items-center gap-y-8 pt-24">
+    <h1 class="text-6xl font-semibold font-creepster text-mauve-400">
+      Phantom Name Picker
+    </h1>
+    <a
+      href="/form"
+      class=" px-2.5 py-2 rounded-md hover:bg-mauve-800 transition-colors bg-mauve-900 font-medium text-sm"
+    >
+      {{ "Change your current Phantom name" if user else "Get a Phantom name" }}
+    </a>
+    <ul class="max-w-lg w-full">
       {% for ghost in ghosts %}
-        <li>
-          {{ ghost["first_name"] }} "{{ ghost["ghost_name"] }}"
-          {{ ghost["last_name"] }}
+        <li
+          class="flex justify-between py-2 not-last:border-b not-last:border-b-mauve-800"
+        >
+          <span>
+            {{ ghost["first_name"] }} "{{ ghost["ghost_name"] }}"
+            {{ ghost["last_name"] }}
+          </span>
+          <span class="text-mauve-400">{{ ghost["email" ] }}</span>
         </li>
       {% endfor %}
     </ul>

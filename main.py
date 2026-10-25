@@ -1,6 +1,6 @@
 import securescaffold
 import os
-from insert_ghost_names import insert_ghost_names
+from seed_database import insert_ghost_names, insert_dummy_users
 from google.cloud import ndb
 from flask import jsonify, url_for, session, redirect, abort, request, render_template
 from models import Ghost, User, update_ghost_name
@@ -11,8 +11,11 @@ import random
 load_dotenv()
 
 app = securescaffold.create_app(__name__)
-client = ndb.Client()
+client = ndb.Client(project="python-app")
 oauth = OAuth(app)
+
+# insert_ghost_names(client)
+# insert_dummy_users(client)
 
 CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
 google = oauth.register(
@@ -83,15 +86,9 @@ def ghosts():
     with client.context():
         query = Ghost.query()
         ghosts = query.fetch()
+        print(ghosts)
 
-        options = []
-        while len(options) < 3:
-            i = random.randint(0, len(ghosts))
-            if ghosts[i].ghost_name in options:
-                continue
-
-            options.append(ghosts[i].ghost_name)
-
+        options = [ghost.ghost_name for ghost in random.sample(ghosts, 3)]
         name = (request.form.get("first_name"), request.form.get("last_name"))
 
         return render_template("form.html", user=user, ghosts=options, name=name)
