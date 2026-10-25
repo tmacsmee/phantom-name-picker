@@ -60,3 +60,4 @@ def insert_dummy_users(client: ndb.Client):
 if __name__ == "__main__":
     seed_client = ndb.Client(project=os.getenv("GOOGLE_CLOUD_PROJECT"))
     insert_ghost_names(seed_client)
+    insert_dummy_users(seed_client)

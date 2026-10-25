@@ -7,3 +7,15 @@
   --font-creepster: Creepster;
   --font-inter: Inter, sans-serif;
 }
+
+.button {
+  @apply px-2.5 py-2 rounded-md transition-colors font-medium text-sm;
+}
+
+.button--primary {
+  @apply border border-mauve-700 bg-mauve-900 hover:bg-mauve-800;
+}
+
+.button--secondary {
+  @apply hover:bg-mauve-800 bg-mauve-900;
+}

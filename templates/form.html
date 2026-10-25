@@ -46,12 +46,7 @@
           />
         </div>
 
-        <button
-          type="submit"
-          class="border border-mauve-700 bg-mauve-900 px-2.5 py-2 rounded-md hover:bg-mauve-800 font-medium text-sm"
-        >
-          Generate
-        </button>
+        <button type="submit" class="button button--primary">Generate</button>
       </form>
     {% endif %}
 
@@ -62,13 +57,13 @@
         <input type="hidden" name="first_name" value="{{ name[0] }}" />
         <input type="hidden" name="last_name" value="{{ name[1] }}" />
 
-        <ul class="grid gap-4 sm:grid-cols-3">
+        <ul class="flex gap-x-4">
           {% for ghost in ghosts %}
             <li>
               <button
                 name="ghost"
                 value="{{ ghost }}"
-                class="border border-mauve-700 bg-mauve-900 px-2.5 py-2 rounded-md hover:bg-mauve-800 font-medium text-sm"
+                class="button--secondary button"
               >
                 {{ name[0] }} "{{ ghost }}" {{ name[1] }}
               </button>

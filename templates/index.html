@@ -4,20 +4,20 @@
     <h1 class="text-6xl font-semibold font-creepster text-mauve-400">
       Phantom Name Picker
     </h1>
-    <a
-      href="/form"
-      class="px-2.5 py-2 rounded-md hover:bg-mauve-800 transition-colors bg-mauve-900 font-medium text-sm"
-    >
-      {{ "Change your current Phantom name" if has_ghost else "Get a Phantom name" }}
-    </a>
-    {% if user %}
-      <a
-        href="{{ url_for('logout') }}"
-        class="text-sm text-mauve-400 hover:text-white"
-      >
-        Sign out
+
+    <div class="flex flex-col gap-y-2 items-center">
+      <a href="/form" class="button button--secondary">
+        {{ "Change your current Phantom name" if has_ghost else "Get a Phantom name" }}
       </a>
-    {% endif %}
+      {% if user %}
+        <a
+          href="{{ url_for('logout') }}"
+          class="text-sm text-mauve-400 hover:text-white"
+        >
+          Sign out
+        </a>
+      {% endif %}
+    </div>
     <ul class="max-w-lg w-full">
       {% for ghost in ghosts %}
         <li
