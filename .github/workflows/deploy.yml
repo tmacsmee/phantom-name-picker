@@ -21,27 +21,26 @@ jobs:
       - name: Authenticate to Google Cloud
         uses: google-github-actions/auth@v3
         with:
-          workload_identity_provider: ${{ secrets.GCP_WIF_PROVIDER }}
-          service_account: ${{ secrets.GCP_DEPLOY_SERVICE_ACCOUNT }}
+          credentials_json: ${{ secrets.GCP_CREDENTIALS }}
 
       - name: Deploy to App Engine
         id: deploy
         uses: google-github-actions/deploy-appengine@v3
         with:
-          project_id: ${{ secrets.GCP_PROJECT_ID }}
+          project_id: project-0fa1ad10-8b1e-4ade-9df
           deliverables: app.yaml
           promote: true
           env_vars: |-
-            GOOGLE_CLOUD_PROJECT=${{ secrets.GCP_PROJECT_ID }}
-            GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}
+            GOOGLE_CLOUD_PROJECT=project-0fa1ad10-8b1e-4ade-9df
+            GOOGLE_CLIENT_ID=617369660388-6ou6v8iv6ae3t4idbdl6fst2smjdmkmr.apps.googleusercontent.com
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
 
       - name: Seed ghost catalog
         run: >-
           gcloud builds submit
           --config cloudbuild.seed.yaml
-          --substitutions=_GOOGLE_CLOUD_PROJECT=${{ secrets.GCP_PROJECT_ID }}
-          --project ${{ secrets.GCP_PROJECT_ID }}
+          --substitutions=_GOOGLE_CLOUD_PROJECT=project-0fa1ad10-8b1e-4ade-9df
+          --project project-0fa1ad10-8b1e-4ade-9df
           --quiet
 
       - name: Print deployed URL

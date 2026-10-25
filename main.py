@@ -1,6 +1,5 @@
 import securescaffold
 import os
-from seed_database import insert_ghost_names, insert_dummy_users
 from google.cloud import ndb
 from flask import jsonify, url_for, session, redirect, abort, request, render_template
 from models import Ghost, User, update_ghost_name
@@ -14,9 +13,6 @@ load_dotenv()
 app = securescaffold.create_app(__name__)
 client = ndb.Client(project=os.getenv("GOOGLE_CLOUD_PROJECT"))
 oauth = OAuth(app)
-
-# insert_ghost_names(client)
-# insert_dummy_users(client)
 
 CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
 google = oauth.register(
@@ -48,7 +44,12 @@ def logout():
 def auth():
     try:
         token = oauth.google.authorize_access_token()
-    except OAuthError:
+    except OAuthError as error:
+        app.logger.warning(
+            "Google OAuth callback failed: %s: %s",
+            type(error).__name__,
+            error,
+        )
         return abort(401, "Google authentication failed")
 
     user_info = token.get("userinfo")
