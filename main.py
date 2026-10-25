@@ -36,7 +36,7 @@ def login():
 @app.get("/logout")
 def logout():
     session.pop("user", None)
-    return redirect("/")
+    return redirect("/form")
 
 
 @app.get("/auth")

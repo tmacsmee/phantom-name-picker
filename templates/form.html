@@ -1,9 +1,16 @@
 {% extends "base.html" %}
 {% block content %}
-  <main class="flex flex-col">
+  <main class="flex flex-col items-center justify-center h-full gap-y-4">
+    <h1 class="text-xl font-semibold">Generate your Phantom name</h1>
+
     {% if not user %}
-      <a href="{{ url_for('login') }}" className="border p-2">Log in</a>
+      <a
+        href="{{ url_for('login') }}"
+        class="px-2.5 py-2 rounded-md hover:bg-mauve-800 transition-colors bg-mauve-900 font-medium text-sm"
+        >Sign in with Google</a
+      >
     {% endif %}
+
     {% if user %}
       <form
         class="flex flex-col gap-y-4 max-w-sm w-full mx-auto"
@@ -41,7 +48,7 @@
           type="submit"
           class="border border-mauve-700 bg-mauve-900 px-2.5 py-2 rounded-md hover:bg-mauve-800 font-medium text-sm"
         >
-          Generate ghost names
+          Generate
         </button>
       </form>
     {% endif %}
