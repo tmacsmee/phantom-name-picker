@@ -2,13 +2,19 @@ import securescaffold
 import os
 from google.cloud import ndb
 from flask import jsonify, url_for, session, redirect, abort, request, render_template
-from src.models import Ghost, User, update_ghost_name
+from src.models import Ghost, User, update_ghost_name, get_allocated_ghosts
 from authlib.integrations.flask_client import OAuth
 from authlib.integrations.base_client.errors import OAuthError
 from dotenv import load_dotenv
 import random
 
 load_dotenv()
+
+GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
+GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
+
+if not GOOGLE_CLIENT_ID or not GOOGLE_CLIENT_SECRET:
+    raise ValueError("Google authentication is not configured")
 
 app = securescaffold.create_app(__name__)
 client = ndb.Client(project=os.getenv("GOOGLE_CLOUD_PROJECT"))
@@ -18,18 +24,14 @@ CONF_URL = "https://accounts.google.com/.well-known/openid-configuration"
 google = oauth.register(
     name="google",
     server_metadata_url=CONF_URL,
-    client_id=os.environ.get("GOOGLE_CLIENT_ID"),
-    client_secret=os.environ.get("GOOGLE_CLIENT_SECRET"),
+    client_id=GOOGLE_CLIENT_ID,
+    client_secret=GOOGLE_CLIENT_SECRET,
     client_kwargs={"scope": "openid email profile"},
 )
 
 
 @app.get("/login")
 def login():
-    if not os.environ.get("GOOGLE_CLIENT_ID") or not os.environ.get(
-        "GOOGLE_CLIENT_SECRET"
-    ):
-        return abort(503, "Google authentication is not configured")
     redirect_uri = url_for("auth", _external=True)
     return oauth.google.authorize_redirect(redirect_uri)
 
@@ -46,8 +48,7 @@ def auth():
         token = oauth.google.authorize_access_token()
     except OAuthError as error:
         app.logger.warning(
-            "Google OAuth callback failed: %s: %s",
-            type(error).__name__,
+            "Google OAuth callback failed: %s",
             error,
         )
         return abort(401, "Google authentication failed")
@@ -61,6 +62,7 @@ def auth():
         "email": user_info.get("email", ""),
         "name": user_info.get("name", ""),
     }
+
     return redirect(url_for("form"))
 
 
@@ -69,29 +71,7 @@ def index():
     auth_user = session.get("user")
 
     with client.context():
-        ghosts = Ghost.query().fetch()
-        owner_keys = [
-            ndb.Key(User, ghost.owner_user_id)
-            for ghost in ghosts
-            if ghost.owner_user_id
-        ]
-        owners = {
-            user.key.id(): user
-            for user in ndb.get_multi(owner_keys)
-            if user is not None
-        }
-
-        allocated = [
-            {
-                "ghost_name": ghost.ghost_name,
-                "description": ghost.description,
-                "first_name": owners[ghost.owner_user_id].first_name,
-                "last_name": owners[ghost.owner_user_id].last_name,
-                "email": owners[ghost.owner_user_id].email,
-            }
-            for ghost in ghosts
-            if ghost.owner_user_id in owners
-        ]
+        allocated = get_allocated_ghosts()
 
         current_user = None
         if auth_user:

@@ -1,4 +1,5 @@
 from google.cloud import ndb
+import random
 
 
 class Ghost(ndb.Model):
@@ -12,6 +13,31 @@ class User(ndb.Model):
     email = ndb.StringProperty()
     first_name = ndb.StringProperty()
     last_name = ndb.StringProperty()
+
+
+def get_allocated_ghosts():
+    ghosts = Ghost.query().fetch()
+
+    owner_keys = [
+        ndb.Key(User, ghost.owner_user_id) for ghost in ghosts if ghost.owner_user_id
+    ]
+
+    owners = ndb.get_multi(owner_keys)
+    owners_by_id = {user.key.id(): user for user in owners if user is not None}
+
+    allocated = []
+    for ghost in ghosts:
+        allocated.append(
+            {
+                "ghost_name": ghost.ghost_name,
+                "description": ghost.description,
+                "first_name": owners_by_id[ghost.owner_user_id].first_name,
+                "last_name": owners_by_id[ghost.owner_user_id].last_name,
+                "email": owners_by_id[ghost.owner_user_id].email,
+            }
+        )
+
+    return allocated
 
 
 @ndb.transactional(xg=True)
