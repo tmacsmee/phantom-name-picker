@@ -1,3 +1,5 @@
+from typing import cast
+
 from google.cloud import ndb
 
 
@@ -18,6 +20,10 @@ def normalise_ghost_name(name: str) -> str:
     return name.lower().replace(" ", "_")
 
 
+def get_available_ghosts():
+    return [ghost for ghost in Ghost.query().fetch() if not ghost.owner_user_id]
+
+
 def get_allocated_ghosts():
     ghosts = Ghost.query().fetch()
 
@@ -25,21 +31,22 @@ def get_allocated_ghosts():
         ndb.Key(User, ghost.owner_user_id) for ghost in ghosts if ghost.owner_user_id
     ]
 
-    owners = ndb.get_multi(owner_keys)
+    owners = cast(list[User | None], ndb.get_multi(owner_keys))
     owners_by_id = {user.key.id(): user for user in owners if user is not None}
 
     allocated = []
     for ghost in ghosts:
-        if ghost.owner_user_id not in owners_by_id:
+        owner = owners_by_id.get(ghost.owner_user_id)
+        if not owner:
             continue
 
         allocated.append(
             {
                 "ghost_name": ghost.ghost_name,
                 "description": ghost.description,
-                "first_name": owners_by_id[ghost.owner_user_id].first_name,
-                "last_name": owners_by_id[ghost.owner_user_id].last_name,
-                "email": owners_by_id[ghost.owner_user_id].email,
+                "first_name": owner.first_name,
+                "last_name": owner.last_name,
+                "email": owner.email,
             }
         )
 
@@ -47,7 +54,7 @@ def get_allocated_ghosts():
 
 
 @ndb.transactional(xg=True)
-def update_ghost_name(
+def assign_ghost_name(
     user_id: str,
     ghost_name: str,
     first_name: str,
@@ -55,7 +62,7 @@ def update_ghost_name(
     email: str = "",
 ):
     ghost_id = normalise_ghost_name(ghost_name)
-    ghost_key = ndb.Key("Ghost", ghost_id)
+    ghost_key = ndb.Key(Ghost, ghost_id)
     ghost = ghost_key.get()
     if not ghost:
         raise ValueError("Ghost does not exist")

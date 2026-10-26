@@ -1,12 +1,17 @@
-import securescaffold
 import os
+import random
+import securescaffold
 from google.cloud import ndb
 from flask import url_for, session, redirect, abort, request, render_template
-from src.models import Ghost, User, update_ghost_name, get_allocated_ghosts
 from authlib.integrations.flask_client import OAuth
 from authlib.integrations.base_client.errors import OAuthError
 from dotenv import load_dotenv
-import random
+from src.models import (
+    User,
+    assign_ghost_name,
+    get_allocated_ghosts,
+    get_available_ghosts,
+)
 
 load_dotenv()
 
@@ -77,10 +82,7 @@ def index():
 
     with client.context():
         allocated = get_allocated_ghosts()
-
-        current_user = None
-        if auth_user:
-            current_user = ndb.Key(User, auth_user["sub"]).get()
+        current_user = ndb.Key(User, auth_user["sub"]).get() if auth_user else None
 
     return render_template(
         "index.html",
@@ -108,9 +110,7 @@ def ghosts():
         return abort(400, "First and last name are required")
 
     with client.context():
-        available = [
-            ghost for ghost in Ghost.query().fetch() if not ghost.owner_user_id
-        ]
+        available = get_available_ghosts()
         options = [
             ghost.ghost_name
             for ghost in random.sample(available, min(3, len(available)))
@@ -152,7 +152,7 @@ def ghost():
 
     with client.context():
         try:
-            update_ghost_name(
+            assign_ghost_name(
                 user_id,
                 selected,
                 first_name,

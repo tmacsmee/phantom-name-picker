@@ -6,8 +6,7 @@ import os
 
 def insert_ghost_names(client: ndb.Client):
     with client.context():
-        csv_path = os.path.join(os.path.dirname(__file__), "ghost-names.csv")
-        with open(csv_path, mode="r") as file:
+        with open("ghost-names.csv", mode="r") as file:
             dict_reader = csv.DictReader(file)
 
             ghost_names = []
