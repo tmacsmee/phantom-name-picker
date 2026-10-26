@@ -1,5 +1,4 @@
 from google.cloud import ndb
-import random
 
 
 class Ghost(ndb.Model):
@@ -27,6 +26,9 @@ def get_allocated_ghosts():
 
     allocated = []
     for ghost in ghosts:
+        if ghost.owner_user_id not in owners:
+            continue
+
         allocated.append(
             {
                 "ghost_name": ghost.ghost_name,

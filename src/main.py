@@ -1,7 +1,7 @@
 import securescaffold
 import os
 from google.cloud import ndb
-from flask import jsonify, url_for, session, redirect, abort, request, render_template
+from flask import url_for, session, redirect, abort, request, render_template
 from src.models import Ghost, User, update_ghost_name, get_allocated_ghosts
 from authlib.integrations.flask_client import OAuth
 from authlib.integrations.base_client.errors import OAuthError
