@@ -13,3 +13,6 @@ dependencies = [
 
 [tool.uv.sources]
 secure-scaffold = { url = "https://github.com/google/gae-secure-scaffold-python3/archive/master.zip" }
+
+[tool.black]
+line-length = 80

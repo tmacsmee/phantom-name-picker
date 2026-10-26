@@ -28,7 +28,9 @@ def get_allocated_ghosts():
     ghosts = Ghost.query().fetch()
 
     owner_keys = [
-        ndb.Key(User, ghost.owner_user_id) for ghost in ghosts if ghost.owner_user_id
+        ndb.Key(User, ghost.owner_user_id)
+        for ghost in ghosts
+        if ghost.owner_user_id
     ]
 
     owners = cast(list[User | None], ndb.get_multi(owner_keys))

@@ -82,7 +82,9 @@ def index():
 
     with client.context():
         allocated = get_allocated_ghosts()
-        current_user = ndb.Key(User, auth_user["sub"]).get() if auth_user else None
+        current_user = (
+            ndb.Key(User, auth_user["sub"]).get() if auth_user else None
+        )
 
     return render_template(
         "index.html",
