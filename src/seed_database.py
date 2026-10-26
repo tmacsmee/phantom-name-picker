@@ -1,12 +1,16 @@
-from src.models import Ghost, User, normalise_ghost_name
-from google.cloud import ndb
 import csv
 import os
+from pathlib import Path
+
+from google.cloud import ndb
+
+from src.models import Ghost, User, normalise_ghost_name
 
 
 def insert_ghost_names(client: ndb.Client):
     with client.context():
-        with open("ghost-names.csv", mode="r") as file:
+        csv_path = Path(__file__).with_name("ghost-names.csv")
+        with csv_path.open(encoding="utf-8") as file:
             dict_reader = csv.DictReader(file)
 
             ghost_names = []
@@ -28,7 +32,7 @@ def insert_dummy_users(client: ndb.Client):
     dummy_users = [
         ("dummy-alice", "alice@example.com", "Alice", "Carter", "Betelgeuse"),
         ("dummy-ben", "ben@example.com", "Ben", "Miller", "Bhoot"),
-        ("dummy-cora", "cora@example.com", "Cora", "Nguyen", "Bloody Mary"),
+        ("dummy-jim", "jim@example.com", "Jim", "Lee", "Bloody Mary"),
     ]
 
     with client.context():
