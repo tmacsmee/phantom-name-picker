@@ -54,7 +54,12 @@ def auth():
         return abort(401, "Google authentication failed")
 
     user_info = token.get("userinfo")
-    if not user_info or not user_info.get("sub"):
+    if (
+        not user_info
+        or not user_info.get("sub")
+        or not user_info.get("email")
+        or not user_info.get("email_verified")
+    ):
         return abort(401, "Google profile is incomplete")
 
     session["user"] = {
@@ -103,7 +108,9 @@ def ghosts():
         return abort(400, "First and last name are required")
 
     with client.context():
-        available = Ghost.query(Ghost.owner_user_id == None).fetch()
+        available = [
+            ghost for ghost in Ghost.query().fetch() if not ghost.owner_user_id
+        ]
         options = [
             ghost.ghost_name
             for ghost in random.sample(available, min(3, len(available)))

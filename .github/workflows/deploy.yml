@@ -27,12 +27,12 @@ jobs:
         id: deploy
         uses: google-github-actions/deploy-appengine@v3
         with:
-          project_id: project-0fa1ad10-8b1e-4ade-9df
+          project_id: ${{ vars.GCP_PROJECT_ID }}
           deliverables: app.yaml
           promote: true
           env_vars: |-
-            GOOGLE_CLOUD_PROJECT=project-0fa1ad10-8b1e-4ade-9df
-            GOOGLE_CLIENT_ID=617369660388-6ou6v8iv6ae3t4idbdl6fst2smjdmkmr.apps.googleusercontent.com
+            GOOGLE_CLOUD_PROJECT=${{ vars.GCP_PROJECT_ID }}
+            GOOGLE_CLIENT_ID=${{ vars.GOOGLE_CLIENT_ID }}
             GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}
 
       - name: Set up Python
@@ -45,8 +45,8 @@ jobs:
 
       - name: Seed ghost catalog
         env:
-          GOOGLE_CLOUD_PROJECT: project-0fa1ad10-8b1e-4ade-9df
-        run: python seed_database.py
+          GOOGLE_CLOUD_PROJECT: ${{ vars.GCP_PROJECT_ID }}
+        run: python -m src.seed_database
 
       - name: Print deployed URL
         run: echo "Deployed ${{ steps.deploy.outputs.version_url }}"

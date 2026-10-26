@@ -1,8 +1,9 @@
 runtime: python313
+entrypoint: gunicorn -b :$PORT src.main:app
 
 handlers:
   - url: /static/
-    static_dir: static
+    static_dir: src/static
     secure: always
     http_headers:
       Strict-Transport-Security: "max-age=2592000; includeSubdomains"

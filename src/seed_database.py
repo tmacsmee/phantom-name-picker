@@ -1,22 +1,19 @@
-from src.models import Ghost, User
+from src.models import Ghost, User, normalise_ghost_name
 from google.cloud import ndb
 import csv
 import os
 
 
-def normalise(name: str) -> str:
-    return name.lower().replace(" ", "_")
-
-
 def insert_ghost_names(client: ndb.Client):
     with client.context():
-        with open("ghost-names.csv", mode="r") as file:
+        csv_path = os.path.join(os.path.dirname(__file__), "ghost-names.csv")
+        with open(csv_path, mode="r") as file:
             dict_reader = csv.DictReader(file)
 
             ghost_names = []
             for row in dict_reader:
                 name = row["Ghost name"]
-                key = ndb.Key(Ghost, normalise(name))
+                key = ndb.Key(Ghost, normalise_ghost_name(name))
                 ghost = key.get()
 
                 if ghost is None:
@@ -38,7 +35,7 @@ def insert_dummy_users(client: ndb.Client):
     with client.context():
         entities = []
         for user_id, email, first_name, last_name, ghost_name in dummy_users:
-            ghost_key = normalise(ghost_name)
+            ghost_key = normalise_ghost_name(ghost_name)
             ghost = ndb.Key(Ghost, ghost_key).get()
             if ghost is None:
                 raise ValueError(f"Ghost does not exist: {ghost_name}")

@@ -14,6 +14,10 @@ class User(ndb.Model):
     last_name = ndb.StringProperty()
 
 
+def normalise_ghost_name(name: str) -> str:
+    return name.lower().replace(" ", "_")
+
+
 def get_allocated_ghosts():
     ghosts = Ghost.query().fetch()
 
@@ -26,7 +30,7 @@ def get_allocated_ghosts():
 
     allocated = []
     for ghost in ghosts:
-        if ghost.owner_user_id not in owners:
+        if ghost.owner_user_id not in owners_by_id:
             continue
 
         allocated.append(
@@ -50,7 +54,7 @@ def update_ghost_name(
     last_name: str,
     email: str = "",
 ):
-    ghost_id = ghost_name.lower().replace(" ", "_")
+    ghost_id = normalise_ghost_name(ghost_name)
     ghost_key = ndb.Key("Ghost", ghost_id)
     ghost = ghost_key.get()
     if not ghost:
